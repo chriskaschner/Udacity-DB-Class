@@ -11,6 +11,8 @@ def testRegister():
     registerPlayer("Joe Malik")
     registerPlayer("Mao Tsu-hsi")
     registerPlayer("Atlanta Hope")
+    registerPlayer("Melpomene Murray")
+    registerPlayer("Randy Schwartz")
 
     # c = countPlayers()
     # if c != 1:
