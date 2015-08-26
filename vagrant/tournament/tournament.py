@@ -17,6 +17,13 @@ def deleteMatches():
 
 def deletePlayers():
     """Remove all the player records from the database."""
+    pg = psycopg2.connect("dbname=tournament")
+    c = pg.cursor()
+    c.execute("DELETE FROM players")
+    print "It is finished"
+
+    pg.commit()
+    pg.close()
 
 
 def countPlayers():
@@ -32,6 +39,12 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
+    pg = psycopg2.connect("dbname=tournament")
+    c = pg.cursor()
+    c.execute("INSERT INTO players (name) VALUES (%s)", (name,))
+    print "success with {0}".format (name)
+    pg.commit()
+    pg.close()
 
 
 def playerStandings():
