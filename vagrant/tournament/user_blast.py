@@ -3,6 +3,7 @@
 # Setup for tournament.py
 
 from tournament import *
+import psycopg2
 
 def testRegister():
     registerPlayer("Chandra Nalaar")
@@ -21,7 +22,10 @@ def testRegister():
 if __name__ == '__main__':
     testRegister()
     raw_input("Success, all players created! Press Enter to continue...")
+    countPlayers()
+    raw_input("Players counted. Press Enter to continue...")
     deletePlayers()
+    countPlayers()
     raw_input("Success, all entries deleted! Press Enter to continue...")
     print "Success, all tests passed!"
 

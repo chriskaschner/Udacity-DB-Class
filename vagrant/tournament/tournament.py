@@ -28,7 +28,12 @@ def deletePlayers():
 
 def countPlayers():
     """Returns the number of players currently registered."""
-
+    pg = psycopg2.connect("dbname=tournament")
+    c = pg.cursor()
+    c.execute("SELECT count(*) AS num_players FROM players")
+    print c.fetchall()[0][0]
+    pg.commit()
+    pg.close()
 
 def registerPlayer(name):
     """Adds a player to the tournament database.
