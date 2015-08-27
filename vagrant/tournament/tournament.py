@@ -5,7 +5,6 @@
 
 import psycopg2
 
-
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
     return psycopg2.connect("dbname=tournament")
@@ -13,26 +12,55 @@ def connect():
 
 def deleteMatches():
     """Remove all the match records from the database."""
-
+    pg = connect()
+    c = pg.cursor()
+    c.execute("DELETE FROM matches")
+    pg.commit()
+    pg.close()
 
 def deletePlayers():
     """Remove all the player records from the database."""
     pg = connect()
     c = pg.cursor()
     c.execute("DELETE FROM players")
-    print "It is finished"
     pg.commit()
     pg.close()
 
+def deleteTournaments():
+    """Remove all the tournments records from the database."""
+    pg = connect()
+    c = pg.cursor()
+    c.execute("DELETE FROM tournmaents")
+    pg.commit()
+    pg.close()
 
-def countPlayers():
+def deleteScoreboards():
+    """Remove all the scoreboard records from the database."""
+    pg = connect()
+    c = pg.cursor()
+    c.execute("DELETE FROM scoreboard")
+    pg.commit()
+    pg.close()
+
+def createTournament(name):
+    """Create new tournament"""
+    pg = connect()
+    c = pg.cursor()
+    c.execute("INSERT INTO tournaments (name) VALUES (%s) RETURNING tid", (name,))
+    tid = c.fetchone()[0]
+    pg.commit()
+    pg.close()
+    return tid
+
+def countPlayers(tid):
     """Returns the number of players currently registered."""
     pg = connect()
     c = pg.cursor()
     c.execute("SELECT count(*) AS num_players FROM players")
-    print c.fetchall()[0][0]
+    num_players = c.fetchone()[0]
     pg.commit()
     pg.close()
+    return num_players
 
 def registerPlayer(name):
     """Adds a player to the tournament database.
@@ -45,11 +73,12 @@ def registerPlayer(name):
     """
     pg = connect()
     c = pg.cursor()
-    c.execute("INSERT INTO players (name) VALUES (%s)", (name,))
-    print "success with {0}".format (name)
+    c.execute("INSERT INTO players (name) VALUES (%s) RETURNING id", (name,))
+    player_id = c.fetchone()[0]
+    c.execute("INSERT INTO scoreboard (player, score, matches, bye) VALUES (%s,%s,%s,%s)", (player_id,0,0,0))
+    c.execute("INSERT INTO results (player, wins, matches) VALUES (%s,%s,%s)", (player_id,0,0))
     pg.commit()
     pg.close()
-
 
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
@@ -64,6 +93,15 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
+    pg = connect()
+    c = pg.cursor()
+    c.execute("SELECT distinct results.player AS id, players.name AS name, results.wins AS wins, results.matches AS matches  FROM players, results WHERE players.id = results.player ORDER BY wins DESC")
+    standings = c.fetchall()
+    pg.commit()
+    pg.close()
+    return standings
+
+    # SELECT scoreboard.player, players.name as name, results.wins AS wins, results.matches AS matches  FROM scoreboard, players, results WHERE players.id = scoreboard.player;
 
 
 def reportMatch(winner, loser):
@@ -73,8 +111,16 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
- 
- 
+    pg = connect()
+    c = pg.cursor()
+    temp_tournament_name = "temp place holder name"
+    tid = createTournament(temp_tournament_name)
+    c.execute("INSERT INTO matches (winner, loser) VALUES (%s, %s)", (winner, loser,))
+    c.execute("UPDATE results SET wins = wins+1 WHERE player = (%s)", (winner,))
+    c.execute("UPDATE results SET matches = matches+1 WHERE player = (%s) OR player = (%s)", (winner,loser,))
+    pg.commit()
+    pg.close()
+
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
   
@@ -90,5 +136,18 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
+    final_list = []
+    standings = playerStandings()
+    i = 0
+    x = len(standings)
+    while i < x:
+        id1 = standings[i][0]
+        name1 = standings[i][1]
+        id2 = standings[i+1][0]
+        name2 = standings[i+1][1]
+        result = (id1, name1, id2, name2)
+        final_list.append(result)
+        i += 2
+    return final_list
 
 

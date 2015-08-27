@@ -3,6 +3,7 @@
 # Test cases for tournament.py
 
 from tournament import *
+tid = 5
 
 def testDeleteMatches():
     deleteMatches()
@@ -18,7 +19,7 @@ def testDelete():
 def testCount():
     deleteMatches()
     deletePlayers()
-    c = countPlayers()
+    c = countPlayers(tid)
     if c == '0':
         raise TypeError(
             "countPlayers() should return numeric zero, not string '0'.")
@@ -31,7 +32,7 @@ def testRegister():
     deleteMatches()
     deletePlayers()
     registerPlayer("Chandra Nalaar")
-    c = countPlayers()
+    c = countPlayers(tid)
     if c != 1:
         raise ValueError(
             "After one player registers, countPlayers() should be 1.")
@@ -45,12 +46,12 @@ def testRegisterCountDelete():
     registerPlayer("Joe Malik")
     registerPlayer("Mao Tsu-hsi")
     registerPlayer("Atlanta Hope")
-    c = countPlayers()
+    c = countPlayers(tid)
     if c != 4:
         raise ValueError(
             "After registering four players, countPlayers should be 4.")
     deletePlayers()
-    c = countPlayers()
+    c = countPlayers(tid)
     if c != 0:
         raise ValueError("After deleting, countPlayers should return zero.")
     print "5. Players can be registered and deleted."

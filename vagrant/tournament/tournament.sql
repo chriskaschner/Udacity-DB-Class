@@ -12,13 +12,13 @@ CREATE TABLE players (
 );
 
 CREATE TABLE tournaments (
-	tournament_id SERIAL primary key,
+	tid SERIAL primary key,
 	name TEXT
 );
 
 CREATE TABLE matches (
-	match_id SERIAL,
-	tournament_id INT REFERENCES tournaments(tournament_id),
+	match_id SERIAL primary key,
+	tid INT REFERENCES tournaments(tid),
 	winner INT REFERENCES players(id),
 	loser INT REFERENCES players(id),
 	draw INT
@@ -26,9 +26,15 @@ CREATE TABLE matches (
 
 CREATE TABLE scoreboard (
 	match_id SERIAL,
-	tournament_id INT REFERENCES tournaments(tournament_id)
-	winner INT REFERENCES players(id),
-	loser INT REFERENCES players(id),
-	draw INT
+	player INT REFERENCES players(id) ON DELETE CASCADE,
+	score INT,
+	matches INT,
+	bye INT
+);
+
+CREATE TABLE results (
+        player INT REFERENCES players(id) ON DELETE CASCADE,
+        wins INT,
+        matches INT
 );
 
