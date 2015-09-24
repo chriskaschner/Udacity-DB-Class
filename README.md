@@ -1,4 +1,5 @@
-rdb-fullstack
+Swiss Tournament
 =============
 
-Common code for the Relational Databases and Full Stack Fundamentals courses
+Files for my final project in the Udacity Relational Database course for 
+building a Swiss style tournament system.
